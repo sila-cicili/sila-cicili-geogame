@@ -85,4 +85,4 @@ This diagram outlines the interaction sequence from game entry to successful cas
 | Status | Triggering Action | Result / System Behavior |
 | :--- | :--- | :--- |
 | **Success** | Player clicks the correct province. | **“VAKA ÇÖZÜMLENDİ”** (Toast Notification) $\rightarrow$ Score and Lives are updated $\rightarrow$ The **“START NEXT MISSION”** modal opens for transition to the next case (if available). |
-| **Loss** | Score $\le 0$ OR Lives $\le 0$. | **“GÖREV İPTAL!”** (Error notification) $\rightarrow$ Map click events are disabled $\rightarrow$ **“RESTART”** button becomes active. |
+| **Loss** | Score $\le 0$ OR Lives $\le 0$. | **“GÖREV İPTAL!”** (Error notification)

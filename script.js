@@ -1,7 +1,7 @@
 // =======================================================================
 // A. GLOBAL TANIMLAR VE AYARLAR
 // =======================================================================
-var vakaDurumu = { can: 3, puan: 100, sure: 60 }; 
+var vakaDurumu = { can: 3, puan: 100, sure: 180 }; 
 var timer; 
 
 var geoJsonLayer; 
@@ -11,30 +11,30 @@ let currentLayer = null;
 var borderLayer = null; 
 
 // SÜTUN VE DOSYA ADLARI
-const GEOJSON_FILE = 'geogame.geojson'; 
+const GEOJSON_FILE = 'songeojson.geojson'; 
 const COLUMNS = {
     IL_ADI: 'adm1_tr',
-    EGITIM: 'EĞITIMS',
-    CEZAEVI: 'CEZAEVİND',
+    EGITIM: 'EĞİTİMS', // Kırık/Kısaltılmış alan adı
+    CEZAEVI: 'cezaevi_field_2',
     YOKSULLUK: 'YOKSULLUKO',
     NUFUS: 'İLLEREGÖ',
-    POLIS_MERKEZ: 'polismerek', 
-    ALKOL_MEKAN: 'alkol meka' 
+    POLIS_MERKEZ: 'polısmerkezı_field_2', 
+    ALKOL_MEKAN: 'alkolmekan_field_2' 
 };
 
 // VAKA LİSTESİ (Çoklu Vaka Sistemi)
 const caseList = [
     {
         id: "VAKA_01",
-        il: "ADANA", 
+        il: "VAN", 
         title: "VAKA #015: Zincirleme Kırılma (Mülkiyet Suçu)",
-        narrative: `Dedektif, yüksek değerli mülkleri hedef alan hırsızlık dalgası yaşandı. Olay yerleri, sosyal kontrolün düşük olduğu ve yüksek finansal zorluk yaşanan bölgeler olabilir. GÖREV: Bu üç risk sinyalinin (Yüksek Cezaevi Çıkışı, Yüksek Yoksulluk, Düşük Eğitim) mantıksal olarak en yoğun olduğu ilimizi bularak, bir sonraki olası suç mahalli profilini doğrulamalıdır.`,
+        narrative: `Dedektif, yüksek değerli mülkleri hedef alan hırsızlık dalgası yaşandı. Olay yerleri, sosyal kontrolün düşük olduğu ve yüksek finansal zorluk yaşanan bölgeler olabilir. GÖREV: Dedektif bu üç risk sinyalinin (Yüksek Cezaevi Çıkışı, Yüksek Yoksulluk, Düşük Eğitim) mantıksal olarak en yoğun olduğu ilimizi bularak, bir sonraki olası suç mahalli profilini doğrulamalıdır.`,
     },
     {
         id: "VAKA_02",
         il: "İSTANBUL", 
-        title: "VAKA #022: Metropol Gölgesi (Kişiye Karşı Suç)",
-        narrative: `ACİL BİLGİ: Bir sonraki suç dalgasının, nüfus yoğunluğunun ve eğitim seviyesinin dengesiz olduğu büyük bir metropolde patlak vermesi bekleniyor. Kişiye karşı suçlar, alkol tüketiminin yüksek olduğu bölgelerde ve polis kontrolünün azaldığı alanlarda patlak verir. GÖREV: Harita katmanlarını kullanarak, sosyal baskı ve nüfus yoğunluğunun en yüksek olduğu İSTANBUL ilini tespit etmenizi gerektiriyor.`,
+        title: "VAKA #002: Metropol Gölgesi (Kişiye Karşı Suç)",
+        narrative: `ACİL BİLGİ: Bir sonraki suç dalgasının, Cinayet suçları, cezaevi çıkışlarının ve alkol tüketiminin yüksek olduğu bölgelerde ve polis kontrolünün azaldığı alanlarda patlak verir. GÖREV: Dedektif bu üç risk sinyalinin (Yüksek Cezaevi Çıkışı, Yüksek Alkollu mekan sayısı, Düşük Polis kontrolü) mantıksal olarak en yoğun olduğu ilimizi bularak, bir sonraki olası suç mahalli profilini doğrulamalıdır.`,
     }
 ];
 
@@ -91,7 +91,7 @@ async function fetchAndLoadGeoJSON() {
         
         const response = await fetch(GEOJSON_FILE);
         if (!response.ok) {
-            throw new Error(`Dosya yüklenemedi: ${response.statusText}. 'geogame.geojson' dosyasını kontrol edin.`);
+            throw new Error(`Dosya yüklenemedi: ${response.statusText}. 'songeojson.geojson' dosyasını kontrol edin.`);
         }
         
         const geojsonData = await response.json();
@@ -168,12 +168,12 @@ function styleAlkolMekan(feature) { // Alkol Mekanı Stili
 
 function getPolisMerkezColor(d) {
     d = parseInt(d);
-    return d > 10 ? '#1a9850' : d > 5 ? '#a6d96a' : '#f46d43';
+    return d > 100 ? '#1a9850' : d > 50 ? '#a6d96a' : d > 20 ? '#fee08b' : '#f46d43';
 }
 
 function getAlkolMekanColor(d) {
     d = parseInt(d);
-    return d > 50 ? '#d73027' : d > 20 ? '#f46d43' : '#a6d96a';
+    return d > 500 ? '#d73027' : d > 200 ? '#f46d43' : d > 50 ? '#fee08b' : '#a6d96a';
 }
 
 
@@ -237,7 +237,7 @@ function switchMapLayer(layerName) {
         }
     } else if (currentCaseIndex === 1) { // VAKA 2 (Cinayet): Eğitim, Polis, Alkol
         if (layerName === 'EGITIM') {
-            newLayer = overlayMaps["Eğitim Risk Skoru (Ana)"]; 
+            newLayer = overlayMaps["Kanıt: Cezaevi Çıkışları"]; 
         } else if (layerName === 'CEZAEVI') {
             newLayer = overlayMaps["Kontrol: Polis Merkezi Sayısı"]; 
         } else if (layerName === 'YOKSULLUK') {
@@ -335,18 +335,18 @@ function resetVaka(yeniSure) {
         const nextCase = caseList[currentCaseIndex];
         ANOMALI_IL_ADI = nextCase.il; 
 
-        // 🚨 GEÇİŞ BİLDİRİMİ
         showToast(`SİSTEM GÜNCELLEDİ: VAKA ${nextCase.id} YÜKLENİYOR...`, 'success', 2500); 
 
         if (currentLayer) { map.removeLayer(currentLayer); currentLayer = null; }
         if (borderLayer) borderLayer.eachLayer(l => l.setStyle(styleBorders(l.feature))); 
         document.querySelectorAll('.ipucu-kartlari').forEach(card => card.classList.remove('active'));
         
-        // Vaka 2'ye özel kart başlık güncellemesi
-        if (currentCaseIndex === 1) { // Vaka 2'ye (index 1) geçildiğinde
-            document.getElementById('kart-1').querySelector('.kart-baslik').innerHTML = "Kanıt 1: Nüfus/Eğitim Stresi";
-            document.getElementById('kart-2').querySelector('.kart-baslik').innerHTML = "Kanıt 2: Cezaevi/Polis Kontrolü";
-            document.getElementById('kart-3').querySelector('.kart-baslik').innerHTML = "Kanıt 3: Yoksulluk/Alkol Mekanları";
+        // 🚨 Vaka 2'ye özel kart başlık güncellemesi
+        if (currentCaseIndex === 1) { 
+            // Başlıkları sadeleştirildi
+            document.getElementById('kart-1').querySelector('.kart-baslik').innerHTML = "Kanıt 1: Cezaevi çıkışları";
+            document.getElementById('kart-2').querySelector('.kart-baslik').innerHTML = "Kanıt 2: Polis Merkezi Sayısı"; 
+            document.getElementById('kart-3').querySelector('.kart-baslik').innerHTML = "Kanıt 3: Alkol Mekanları Sayısı";
 
             document.getElementById('ipucu-egitim').innerHTML = 'Veri Bekleniyor...';
             document.getElementById('ipucu-cezaevi').innerHTML = 'Veri Bekleniyor...';
@@ -398,11 +398,18 @@ function showToast(message, type = 'success', duration = 3000) {
 function showRawDataModal(properties) {
     document.getElementById('raw-data-modal').style.display = 'block';
     
+    // 1. Veri Doldurma
     document.getElementById('data-il-adi').innerHTML = `Ham Veri Dosyası: ${properties[COLUMNS.IL_ADI]}`;
+    
+    // Temel Dört Veri
     document.getElementById('raw-nufus').innerHTML = properties[COLUMNS.NUFUS] ? parseInt(properties[COLUMNS.NUFUS]).toLocaleString() : 'N/A';
     document.getElementById('raw-egitim').innerHTML = properties[COLUMNS.EGITIM] ? cleanAndParseFloat(properties[COLUMNS.EGITIM]).toFixed(1) + ' Yıl' : 'N/A';
     document.getElementById('raw-cezaevi').innerHTML = properties[COLUMNS.CEZAEVI] ? parseInt(properties[COLUMNS.CEZAEVI]).toLocaleString() + ' Kişi' : 'N/A';
     document.getElementById('raw-yoksulluk').innerHTML = properties[COLUMNS.YOKSULLUK] ? cleanAndParseFloat(properties[COLUMNS.YOKSULLUK]).toFixed(2) + ' %' : 'N/A';
+
+    // 🚨 YENİ EKLENEN İKİ ALAN (POLIS ve ALKOL)
+    document.getElementById('raw-polis').innerHTML = properties[COLUMNS.POLIS_MERKEZ] ? parseInt(properties[COLUMNS.POLIS_MERKEZ]).toLocaleString() : 'N/A';
+    document.getElementById('raw-alkol').innerHTML = properties[COLUMNS.ALKOL_MEKAN] ? parseInt(properties[COLUMNS.ALKOL_MEKAN]).toLocaleString() : 'N/A';
 }
 
 function closeRawDataModal() {
@@ -427,7 +434,7 @@ function checkPrediction(e) {
         vakaDurumu.can -= 1;
         
         e.target.setStyle({ fillColor: '#FF0000', color: 'red', weight: 4 }); 
-        showToast(`HATALI TAHMİN! Puan (-${puanKaybi}) ve Lisans Puanı (-1).`, 'error', 3000);
+        showToast(`HATALI TAHMİN! Puan (-${puanKaybi}) ve Can (-1).`, 'error', 3000);
         
         if (vakaDurumu.can > 0 && vakaDurumu.puan > 0) { startTimer(); } else { resetVaka(0); }
     }
@@ -454,7 +461,7 @@ function updateClueCards(properties) {
         `Üstünde (%${yoksullukVal.toFixed(1)}) - FİNANSAL ZORLUK` :
         `Altında (%${yoksullukVal.toFixed(1)}) - FİNANSAL GÜVENDE`;
 
-    // KART İÇERİKLERİNİN VAKA BAZINDA GÜNCELLENMESİ
+    // KART İÇERİKLERİNİN VAKA BAZINDA GÜNCELLEMESİ
     if (currentCaseIndex === 0) { // VAKA 1: Hırsızlık
         L.DomUtil.get('ipucu-egitim').innerHTML = isNaN(egitimVal) ? 'VERİ HATALI' : `Eğitim: ${egitimHint}`;
         L.DomUtil.get('ipucu-cezaevi').innerHTML = cezaeviHint;
@@ -477,9 +484,11 @@ function updateClueCards(properties) {
             `Nüfus: YÜKSEK Yoğunluk (${nufusVal.toLocaleString()})` :
             `Nüfus: NORMAL Yoğunluk (${nufusVal.toLocaleString()})`;
 
-
-        L.DomUtil.get('ipucu-egitim').innerHTML = isNaN(egitimVal) ? 'VERİ HATALI' : `${nufusHint} <br> Eğitim: ${egitimHint}`;
-        L.DomUtil.get('ipucu-cezaevi').innerHTML = `${cezaeviHint} <br> Polis: ${polisHint}`;
-        L.DomUtil.get('ipucu-yoksulluk').innerHTML = isNaN(yoksullukVal) ? 'VERİ HATALI' : `${yoksullukHint} <br> Alkol: ${alkolHint}`;
+        // Kart 1 (Nüfus/Eğitim)
+        L.DomUtil.get('ipucu-egitim').innerHTML = isNaN(egitimVal) ? 'VERİ HATALI' : `${cezaeviHint} <br> `;
+        // Kart 2 (Cezaevi/Polis)
+        L.DomUtil.get('ipucu-cezaevi').innerHTML = ` ${polisHint}<br>`;
+        // Kart 3 (Yoksulluk/Alkol)
+        L.DomUtil.get('ipucu-yoksulluk').innerHTML = isNaN(yoksullukVal) ? 'VERİ HATALI' : ` ${alkolHint}<br>`;
     }
 }

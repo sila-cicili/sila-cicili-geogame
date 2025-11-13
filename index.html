@@ -23,12 +23,12 @@
         <hr>
 
         <div id="durum-bilgisi">
-            Puan: <span id="puan">0</span> | Süre: <span id="sure">--</span>s | Lisans Puanı: <span id="can">3</span>
+            Puan: <span id="puan">0</span> | Süre: <span id="sure">--</span>s | Can: <span id="can">3</span>
         </div>
         
         <p class="not">
-            <p>Haritadaki bir ile tıklayarak Ham Veri Tablosunu açın.</p>
-            
+            <p>Haritadaki bir ile tıklayarak tahmininizi yapın.</p>
+            <p>Farenizi herhangi bir ilin üzerine getirdiğinizde kanıt kutucukları üzerinden verileri kontrol edebilirsiniz.</p>
             </p>Kanıt kutularına tıklayarak verileri inceleyin.</p>
         </p>
     </div>
@@ -39,7 +39,7 @@
             <div class="kart-icerik" id="ipucu-egitim"></div>
         </div>
         <div class="ipucu-karti" id="kart-2" onclick="switchMapLayer('CEZAEVI')">
-            <div class="kart-baslik">Kanıt 2: Ceza İnfaz Çıkışları</div>
+            <div class="kart-baslik">Kanıt 2: Cezaevi Çıkışları</div>
             <div class="kart-icerik" id="ipucu-cezaevi"></div>
         </div>
         <div class="ipucu-karti" id="kart-3" onclick="switchMapLayer('YOKSULLUK')">
@@ -90,6 +90,8 @@
                     <tr><td>Eğitim Süresi (Yıl)</td><td id="raw-egitim"></td></tr>
                     <tr><td>Cezaevi Çıkışları (Kişi)</td><td id="raw-cezaevi"></td></tr>
                     <tr><td>Göreli Yoksulluk (%)</td><td id="raw-yoksulluk"></td></tr>
+                    <tr><td>Polis Merkezi Sayısı</td><td id="raw-polis"></td></tr>
+                    <tr><td>Alkol Mekan Sayısı</td><td id="raw-alkol"></td></tr>
                 </tbody>
             </table>
             

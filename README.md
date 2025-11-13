@@ -52,6 +52,7 @@ The game is based on the principle of Crime Geography: The player's task is to l
 This document outlines the intended frontend structure and the step-by-step logical flow (User Experience) of the GeoCrime game, confirming the design requirements for the GMT 458 assignment.
 
 ---
+![GeoCrime Final Ekran Düzeni ve Etkileşim Noktaları](görsel3.png)
 
 ### 1. 🎮 MOCKUP 1: Main Game Interface (Desktop View)
 
